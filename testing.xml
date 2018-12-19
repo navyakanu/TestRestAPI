@@ -3,7 +3,7 @@
 <suite  name="Smoke">
     <test name="smoke">
         <classes>
-            <class name="TestEntryPoint"/>
+            <class name="TestGETAPI"/>
         </classes>
     </test>
 </suite>
