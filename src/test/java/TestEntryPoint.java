@@ -1,20 +1,51 @@
 import io.restassured.RestAssured;
+import io.restassured.response.Response;
 import org.testng.annotations.*;
-import org.testng.log4testng.Logger;
+import utilities.GetURL;
 
-import static io.restassured.RestAssured.when;
+import java.io.IOException;
 
-public class TestEntryPoint extends TestBase {
+import static io.restassured.RestAssured.*;
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 
-    Logger logger = Logger.getLogger(TestEntryPoint.class);
+public class TestEntryPoint {
+
+    public Response response;
+
+    @BeforeMethod
+    public void setup() throws IOException {
+        FactoryClass.Initialise();
+        response = get(GetURL.POSTSENDPOINTURL);
+        long timeInMs =response.time(); //Measure response time
+    }
 
     @Test
-    public void getUserDetails() {
-        logger.debug("Executing test1-Get user credentials");
-        when().
-                get("/public-api/users?access-token=your_token").
+    public void getUserDetailsAndValidateTheStatusCode() {
+        response.
                 then().
-                statusCode(200);
+                statusCode(200).
+                log().status();
+    }
+
+    @Test
+    public void verifyIfResponseSchemaIsCorrect() {
+            response
+                .then()
+                .assertThat().body(matchesJsonSchemaInClasspath("ModelSchema.json"))
+                .log().body();
+    }
+
+    @Test
+    public void verifyIfResponseResponseIsCorrect() {
+        response
+                .then()
+                .assertThat().body(matchesJsonSchemaInClasspath("ModelSchema.json"))
+                .log().body();
+    }
+
+    @AfterMethod
+    public void tearDown(){
+        RestAssured.reset();
     }
 
 
